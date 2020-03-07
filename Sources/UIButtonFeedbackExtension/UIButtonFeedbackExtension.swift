@@ -39,7 +39,7 @@ public extension UIButton {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
 
-        if feedbackOnTouchDown {
+        if feedbackOnTouchDown, touches.anyTouch(in: self) {
             feedbackGenerator?.selectionChanged()
         }
     }
@@ -47,7 +47,7 @@ public extension UIButton {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
 
-        if feedbackOnTouchUp {
+        if feedbackOnTouchUp, touches.anyTouch(in: self) {
             feedbackGenerator?.selectionChanged()
         }
     }
@@ -61,5 +61,13 @@ public extension UIButton {
         case (_, _, _): // no change required
             break
         }
+    }
+}
+
+private extension Set where Element == UITouch {
+    func anyTouch(in view: UIView) -> Bool {
+        return lazy
+            .map { $0.location(in: view) }
+            .contains { view.bounds.contains($0) }
     }
 }
